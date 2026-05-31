@@ -1,0 +1,91 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\..\FrameXML\UI.xsd">
+
+	<!--
+		Cheat-sheet window layout.
+
+		A plain dialog: a bare Frame given the standard bordered, dark-backed look
+		via DialogBorderTemplate, with no portrait. Pure layout only. All behaviour
+		(paging, dragging, resizing, button clicks) is wired up in Lua
+		(CheatSheet.lua, Me.CheatSheet_Init) so this file stays a plain description
+		of the widgets.
+	-->
+	<Frame name="EmberhollowCheatSheetFrame" parent="UIParent" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" hidden="true">
+		<Size x="380" y="320"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+
+		<Layers>
+			<Layer level="OVERLAY">
+				<!-- Title bar text, centred near the top. -->
+				<FontString parentKey="TitleText" inherits="GameFontNormal" justifyH="CENTER">
+					<Anchors>
+						<Anchor point="TOP" x="0" y="-13"/>
+					</Anchors>
+				</FontString>
+				<!-- Page body text. Sits between the title and the bottom controls. -->
+				<FontString parentKey="Body" inherits="GameFontHighlight" justifyH="LEFT" justifyV="TOP">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="18" y="-36"/>
+						<Anchor point="BOTTOMRIGHT" x="-18" y="42"/>
+					</Anchors>
+				</FontString>
+				<!-- "Page X / N" counter, centred between the arrows. -->
+				<FontString parentKey="PageNum" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM" x="0" y="16"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<!-- Standard bordered dialog frame (dark background + gold border). -->
+			<Frame parentKey="Border" inherits="DialogBorderTemplate"/>
+
+			<!-- Close (X) button, top-right. -->
+			<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-3" y="-3"/>
+				</Anchors>
+			</Button>
+
+			<!-- Previous-page arrow (bottom-left). -->
+			<Button parentKey="PrevButton">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" x="12" y="10"/>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+
+			<!-- Next-page arrow (bottom-right, left of the resize grip). -->
+			<Button parentKey="NextButton">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-24" y="10"/>
+				</Anchors>
+				<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+				<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+				<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+			</Button>
+
+			<!-- Resize grip in the very bottom-right corner. Behaviour in Lua. -->
+			<Button parentKey="ResizeButton">
+				<Size x="16" y="16"/>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-5" y="5"/>
+				</Anchors>
+				<NormalTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Up"/>
+				<PushedTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Down"/>
+				<HighlightTexture file="Interface\ChatFrame\UI-ChatIM-SizeGrabber-Highlight" alphaMode="ADD"/>
+			</Button>
+		</Frames>
+
+	</Frame>
+
+</Ui>
