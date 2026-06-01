@@ -1,0 +1,16 @@
+## Interface: 120005, 120007
+## Title: Emberhollow Pact Helper
+## Notes: Roleplay dice rolling and a "typing..." indicator.
+## Author: Emberhollow Pact
+## Version: 1.0.2
+## SavedVariables: EmberhollowPactHelperDB
+## Category-enUS: Roleplay
+## IconTexture: Interface/Buttons/UI-GroupLoot-Dice-Up
+
+Core.lua
+Dice.lua
+Typing.lua
+CheatSheet.lua
+CheatSheet.xml
+Options.lua
+Console.lua

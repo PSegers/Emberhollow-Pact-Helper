@@ -1,0 +1,7 @@
+Changelog
+
+1.0.2
+Chained dice rolls, e.g. /dice 2d6+1d6+7d12+6.
+Daggerheart Duality: a single 2d12 colours its total by crit (green), Hope (orange) or Fear (purple). Renames /eph matchcrit to /eph duality.
+Options page under Game Menu > Options > AddOns: feature toggles plus customisable Duality colours (colourblind-friendly). Open with /eph options.
+/eph resetbutton failsafe to recover a lost typing button.
