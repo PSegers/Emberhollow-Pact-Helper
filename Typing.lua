@@ -191,11 +191,11 @@ local function CreateToastFrame()
 end
 
 -------------------------------------------------------------------------------
--- Anchor the toggle button at its default spot, under the first chat tab.
+-- Anchor the toggle button at its default spot, the middle of the screen.
 --
 local function AnchorButtonDefault()
 	typingButton:ClearAllPoints()
-	typingButton:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
+	typingButton:SetPoint( "CENTER", UIParent, "CENTER", 0, 0 )
 end
 
 -------------------------------------------------------------------------------
@@ -220,7 +220,7 @@ local function CreateToggleButton()
 	local b = CreateFrame( "Button", "EmberhollowTypingButton", UIParent )
 	b:SetSize( 27, 26 )
 	b:SetFrameStrata( "LOW" )
-	b:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
+	b:SetPoint( "CENTER", UIParent, "CENTER", 0, 0 )
 
 	-- Build the button's state textures explicitly via SetAtlas (valid on every
 	-- Texture object) rather than the Set*Atlas button shortcuts, which aren't
@@ -317,9 +317,9 @@ function Me.Typing_RefreshButton()
 end
 
 -------------------------------------------------------------------------------
--- Failsafe: snap the manual toggle button back to its default spot under the
--- chat tab, in case it got dragged somewhere it can't be found. Visibility
--- still follows the typing setting.
+-- Failsafe: snap the manual toggle button back to its default spot in the
+-- middle of the screen, in case it got dragged somewhere it can't be found.
+-- Visibility still follows the typing setting.
 --
 function Me.Typing_ResetButton()
 	if not typingButton then return end
@@ -330,7 +330,7 @@ function Me.Typing_ResetButton()
 	-- (e.g. from fiddling in Edit Mode), regardless of the typing toggle.
 	typingButton:SetAlpha( 1 )
 	typingButton:Show()
-	Me.Print( "Typing button reset and revealed at its default position." )
+	Me.Print( "Typing button reset and revealed in the middle of the screen." )
 end
 
 -------------------------------------------------------------------------------

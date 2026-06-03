@@ -26,7 +26,7 @@ stock WoW API.
 | `/eph` | Show help. |
 | `/eph options` | Open the options panel (also `config`, `opt`); also under Game Menu > Options > AddOns. |
 | `/eph typing [on\|off]` | Toggle the typing indicator (default on). |
-| `/eph resetbutton` | Failsafe: move the manual typing button back to its default spot and reveal it (also `resettyping`). |
+| `/eph resetbutton` | Failsafe: move the manual typing button to the middle of the screen and reveal it (also `resettyping`). |
 | `/eph grouprolls [on\|off]` | Also show plain-text rolls broadcast by the group (default off). |
 | `/eph duality [on\|off]` | Colour a single 2d12 total by Daggerheart Duality: crit (green), Hope (orange), Fear (purple). Default on; recolour the three from the options panel. |
 
