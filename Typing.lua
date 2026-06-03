@@ -191,6 +191,29 @@ local function CreateToastFrame()
 end
 
 -------------------------------------------------------------------------------
+-- Anchor the toggle button at its default spot, under the first chat tab.
+--
+local function AnchorButtonDefault()
+	typingButton:ClearAllPoints()
+	typingButton:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
+end
+
+-------------------------------------------------------------------------------
+-- Apply the position saved in Me.db (relative to UIParent), or fall back to the
+-- default anchor when the player has never dragged the button.
+--
+local function RestoreButtonPosition()
+	if not typingButton then return end
+	local pos = Me.db and Me.db.typingButtonPos
+	if pos then
+		typingButton:ClearAllPoints()
+		typingButton:SetPoint( pos.point or "TOP", UIParent, pos.relPoint or "CENTER", pos.x or 0, pos.y or 0 )
+	else
+		AnchorButtonDefault()
+	end
+end
+
+-------------------------------------------------------------------------------
 -- Build the manual-toggle chat button.
 --
 local function CreateToggleButton()
@@ -233,14 +256,21 @@ local function CreateToggleButton()
 
 	b.manual = false
 
-	-- Draggable + remembered position.
+	-- Draggable + remembered position. SetUserPlaced is unreliable for custom
+	-- addon frames, so we persist the dragged spot ourselves in Me.db and
+	-- reapply it on the next login (see RestoreButtonPosition).
 	b:SetClampedToScreen( true )
 	b:SetMovable( true )
 	b:EnableMouse( true )
 	b:RegisterForDrag( "LeftButton" )
 	b:SetScript( "OnDragStart", b.StartMoving )
-	b:SetScript( "OnDragStop", function( self ) self:StopMovingOrSizing() end )
-	b:SetUserPlaced( true )
+	b:SetScript( "OnDragStop", function( self )
+		self:StopMovingOrSizing()
+		if Me.db then
+			local point, _, relPoint, x, y = self:GetPoint()
+			Me.db.typingButtonPos = { point = point, relPoint = relPoint, x = x, y = y }
+		end
+	end )
 
 	b:SetScript( "OnClick", OnButtonClick )
 	b:SetScript( "OnEnter", function( self )
@@ -258,6 +288,7 @@ local function CreateToggleButton()
 	b:SetScript( "OnLeave", function() GameTooltip:Hide() end )
 
 	typingButton = b
+	RestoreButtonPosition()
 end
 
 -------------------------------------------------------------------------------
@@ -292,9 +323,9 @@ end
 --
 function Me.Typing_ResetButton()
 	if not typingButton then return end
-	typingButton:ClearAllPoints()
-	typingButton:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
-	typingButton:SetUserPlaced( true )
+	-- Forget any dragged position so it doesn't get reapplied on next login.
+	if Me.db then Me.db.typingButtonPos = nil end
+	AnchorButtonDefault()
 	-- Failsafe reveal: undo a stray drag *and* an accidental hide / zeroed alpha
 	-- (e.g. from fiddling in Edit Mode), regardless of the typing toggle.
 	typingButton:SetAlpha( 1 )
