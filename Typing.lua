@@ -191,16 +191,19 @@ local function CreateToastFrame()
 end
 
 -------------------------------------------------------------------------------
--- Anchor the toggle button at its default spot, the middle of the screen.
+-- Anchor the toggle button at its default spot, tucked under the chat tab.
 --
 local function AnchorButtonDefault()
 	typingButton:ClearAllPoints()
-	typingButton:SetPoint( "CENTER", UIParent, "CENTER", 0, 0 )
+	typingButton:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
 end
 
 -------------------------------------------------------------------------------
 -- Apply the position saved in Me.db (relative to UIParent), or fall back to the
--- default anchor when the player has never dragged the button.
+-- default anchor when the player has never dragged the button. We persist the
+-- spot ourselves rather than via SetUserPlaced because WoW's auto-restore of
+-- user-placed *addon* frames is unreliable -- it silently fails to re-apply the
+-- saved position on some characters (Virtusia being the case that surfaced it).
 --
 local function RestoreButtonPosition()
 	if not typingButton then return end
@@ -219,8 +222,10 @@ end
 local function CreateToggleButton()
 	local b = CreateFrame( "Button", "EmberhollowTypingButton", UIParent )
 	b:SetSize( 27, 26 )
-	b:SetFrameStrata( "LOW" )
-	b:SetPoint( "CENTER", UIParent, "CENTER", 0, 0 )
+	-- MEDIUM (rather than LOW) so the button always draws *above* the chat
+	-- frame; with an opaque chat background a LOW button gets hidden behind it.
+	b:SetFrameStrata( "MEDIUM" )
+	b:SetPoint( "TOP", ChatFrame1Tab, "BOTTOM", 0, -4 )
 
 	-- Build the button's state textures explicitly via SetAtlas (valid on every
 	-- Texture object) rather than the Set*Atlas button shortcuts, which aren't
@@ -317,9 +322,9 @@ function Me.Typing_RefreshButton()
 end
 
 -------------------------------------------------------------------------------
--- Failsafe: snap the manual toggle button back to its default spot in the
--- middle of the screen, in case it got dragged somewhere it can't be found.
--- Visibility still follows the typing setting.
+-- Failsafe: snap the manual toggle button back to its default spot under the
+-- chat tab, in case it got dragged somewhere it can't be found. Visibility
+-- still follows the typing setting.
 --
 function Me.Typing_ResetButton()
 	if not typingButton then return end
@@ -330,7 +335,7 @@ function Me.Typing_ResetButton()
 	-- (e.g. from fiddling in Edit Mode), regardless of the typing toggle.
 	typingButton:SetAlpha( 1 )
 	typingButton:Show()
-	Me.Print( "Typing button reset and revealed in the middle of the screen." )
+	Me.Print( "Typing button reset and revealed at its default spot under the chat tab." )
 end
 
 -------------------------------------------------------------------------------
