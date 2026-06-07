@@ -2,15 +2,25 @@
 ## Title: Emberhollow Pact Helper
 ## Notes: Roleplay dice rolling and a "typing..." indicator.
 ## Author: Emberhollow Pact
-## Version: 1.0.2
+## Version: 1.1.0
 ## SavedVariables: EmberhollowPactHelperDB
 ## Category-enUS: Roleplay
-## IconTexture: Interface/Buttons/UI-GroupLoot-Dice-Up
+## IconTexture: Interface/AddOns/EmberhollowPactHelper/EPHLogo.tga
+## OptionalDeps: totalRP3
+
+Libs/LibStub/LibStub.lua
+Libs/CallbackHandler-1.0/CallbackHandler-1.0.xml
+Libs/LibDataBroker-1.1/LibDataBroker-1.1.lua
+Libs/LibDBIcon-1.0/lib.xml
+Libs/EditModeExpanded-1.0/EditModeExpanded-1.0.xml
 
 Core.lua
 Dice.lua
 Typing.lua
 CheatSheet.lua
 CheatSheet.xml
+Marker.lua
+Minimap.lua
+TRP.lua
 Options.lua
 Console.lua

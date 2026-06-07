@@ -39,6 +39,27 @@ local DB_DEFAULTS = {
 	dualityCritColor = { r = 0,    g = 1,    b = 0    },
 	dualityHopeColor = { r = 1,    g = 0.5,  b = 0    },
 	dualityFearColor = { r = 0.64, g = 0.21, b = 0.93 },
+
+	-- Position stores for the typing bar and the manual toggle button, owned by
+	-- EditModeExpanded-1.0. The library reads/writes x/y and per-Edit-Mode-layout
+	-- profiles inside each; we just hand it persistent tables to live in. Both
+	-- frames are now repositioned through WoW's Edit Mode (see Typing.lua).
+	typingBarEditMode = {},
+	typingButtonEditMode = {},
+
+	-- Marker naming: custom RP names for the 8 raid target icons (Star..Skull),
+	-- shared with the group over the "M" message. markerPanel remembers where the
+	-- editor window was dragged (see Marker.lua).
+	markerNames = { "", "", "", "", "", "", "", "" },
+	markerPanel = {},
+
+	-- "DM" mode: only a DM may edit/clear the marker names (others see them
+	-- read-only and still receive updates). Toggled by /eph dm or the options.
+	dmEnabled = false,
+
+	-- Minimap launcher button settings table owned by LibDBIcon-1.0 (it stores
+	-- hide + minimapPos here). See Minimap.lua.
+	minimap = { hide = false },
 }
 
 -------------------------------------------------------------------------------
@@ -72,6 +93,73 @@ end
 --
 function Me.Print( msg )
 	DEFAULT_CHAT_FRAME:AddMessage( "|cffffd100Emberhollow:|r " .. tostring( msg ) )
+end
+
+-------------------------------------------------------------------------------
+-- Window styling: the shared look for our windows, modelled on Total RP's main
+-- panels -- a parchment-textured interior under a soft dark "shadow" overlay,
+-- inside the ornate gold dialog border, with white text on top. All stock WoW
+-- textures; no bundled art.
+--
+-- Earlier attempts used a light parchment with dark "ink" text, but the paper
+-- kept reading too dark for the text to stand out. Deliberately darkening the
+-- interior and switching to white text (Me.TEXT_COLOR) gives high contrast that
+-- reads cleanly, while the parchment grain keeps the RP feel.
+--
+-- The frame must inherit BackdropTemplate (for the gold edge); we paint the
+-- interior ourselves (a background texture + a translucent black overlay) so the
+-- brightness is fully under our control rather than at the mercy of a backdrop
+-- bgFile.
+--
+local FRAME_BORDER = {
+	edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Border",
+	edgeSize = 32,
+}
+
+-- Warm near-white for text drawn on the shadowed parchment.
+Me.TEXT_COLOR = { r = 0.98, g = 0.95, b = 0.88 }
+
+local function StyleInterior( frame )
+	if frame.ephStyled then return end   -- build the textures once
+	frame.ephStyled = true
+
+	-- Parchment grain, inset to sit inside the gold border.
+	local bg = frame:CreateTexture( nil, "BACKGROUND" )
+	bg:SetPoint( "TOPLEFT", 11, -12 )
+	bg:SetPoint( "BOTTOMRIGHT", -12, 11 )
+	bg:SetTexture( "Interface\\AchievementFrame\\UI-Achievement-Parchment-Horizontal" )
+
+	-- Warm dark overlay that deepens the paper into a rich brown so white text
+	-- lifts cleanly off it (tinted, not flat grey).
+	local shade = frame:CreateTexture( nil, "BORDER" )
+	shade:SetAllPoints( bg )
+	shade:SetColorTexture( 0.06, 0.03, 0.01, 0.72 )
+end
+
+function Me.StyleParchmentFrame( frame )
+	if not frame or not frame.SetBackdrop then return end
+	frame:SetBackdrop( FRAME_BORDER )
+	frame:SetBackdropBorderColor( 1, 1, 1 )  -- natural gold border
+	StyleInterior( frame )
+end
+
+-------------------------------------------------------------------------------
+-- Shared click handler for the launchers (the minimap button and the Total RP
+-- toolbar button both route here):
+--   left-click          -> Options
+--   right-click         -> Marker names
+--   shift + right-click -> Cheat sheet
+--
+function Me.LauncherClick( mouseButton )
+	if mouseButton == "RightButton" then
+		if IsShiftKeyDown() then
+			Me.CheatSheet_Toggle()
+		else
+			Me.Marker_Toggle()
+		end
+	else
+		Me.Options_Open()
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -151,6 +239,11 @@ local function OnAddonMessage( prefix, text, _channel, sender )
 	elseif msgtype == "T" then
 		-- typing
 		Me.Typing_OnTyping( sender, fields[1] == "1" )
+	elseif msgtype == "M" then
+		-- marker name: index (1-8), name (may be empty to clear)
+		if Me.Marker_OnMessage then
+			Me.Marker_OnMessage( sender, tonumber( fields[1] ), fields[2] or "" )
+		end
 	end
 end
 
@@ -211,6 +304,8 @@ bootstrap:SetScript( "OnEvent", function( self, event, arg1 )
 		SafeInit( "Dice", Me.Dice_Init )
 		SafeInit( "Typing", Me.Typing_Init )
 		SafeInit( "CheatSheet", Me.CheatSheet_Init )
+		SafeInit( "Marker", Me.Marker_Init )
+		SafeInit( "Minimap", Me.Minimap_Init )
 		SafeInit( "Options", Me.Options_Init )
 			SafeInit( "Console", Me.Console_Init )
 

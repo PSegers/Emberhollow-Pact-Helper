@@ -133,11 +133,19 @@ function Me.Options_Init()
 		end )
 	cbDuality:SetPoint( "TOPLEFT", cbGroup, "BOTTOMLEFT", 0, -8 )
 
+	local cbDM = MakeCheck( panel, "DM mode (only you can edit the marker names)",
+		function() return Me.db.dmEnabled end,
+		function( v )
+			Me.db.dmEnabled = v
+			if Me.Marker_Refresh then Me.Marker_Refresh() end
+		end )
+	cbDM:SetPoint( "TOPLEFT", cbDuality, "BOTTOMLEFT", 0, -8 )
+
 	---------------------------------------------------------------------------
 	-- Duality dice colours.
 	--
 	local hdr = panel:CreateFontString( nil, "ARTWORK", "GameFontNormal" )
-	hdr:SetPoint( "TOPLEFT", cbDuality, "BOTTOMLEFT", 2, -18 )
+	hdr:SetPoint( "TOPLEFT", cbDM, "BOTTOMLEFT", 2, -18 )
 	hdr:SetText( "Duality dice colours" )
 
 	local hint = panel:CreateFontString( nil, "ARTWORK", "GameFontDisableSmall" )
@@ -184,6 +192,7 @@ function Me.Options_Init()
 		cbTyping.Refresh()
 		cbGroup.Refresh()
 		cbDuality.Refresh()
+		cbDM.Refresh()
 		for _, s in ipairs( swatches ) do s.UpdateTex() end
 		SetSwatchesEnabled( Me.db.dualityEnabled and true or false )
 	end )
@@ -194,7 +203,6 @@ function Me.Options_Init()
 	--
 	if Settings and Settings.RegisterCanvasLayoutCategory then
 		local category = Settings.RegisterCanvasLayoutCategory( panel, panel.name )
-		category.ID = panel.name
 		Settings.RegisterAddOnCategory( category )
 		Me.optionsCategory = category
 	elseif InterfaceOptions_AddCategory then

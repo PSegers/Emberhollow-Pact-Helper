@@ -1,5 +1,15 @@
 Changelog
 
+1.1.0
+Marker Naming: give the 8 raid target icons (Star..Skull) custom RP names that sync to your group. Edit them in a panel (/eph marker) or from chat (/eph marker skull <name>, /eph marker list).
+Minimap launcher button: left-click opens Options, right-click opens Marker names, shift-right-click opens the Cheat sheet. Drag it around the ring; toggle with /eph minimap. Also adds a Blizzard addon-compartment entry.
+Total RP 3 integration: when TRP is installed, adds a matching button to its toolbar (same clicks). Fully optional -- does nothing without TRP.
+The Cheat sheet and Marker windows now use a parchment-on-gold look instead of the dark background.
+
+1.0.3
+The "is typing..." bar and the manual toggle button now move through WoW's built-in Edit Mode (drag them there; positions save per Edit Mode layout). Uses the EditModeExpanded library.
+Removed /eph resetbutton (and resettyping) -- Edit Mode handles repositioning, with a per-frame Reset built in.
+
 1.0.2
 Chained dice rolls, e.g. /dice 2d6+1d6+7d12+6.
 Daggerheart Duality: a single 2d12 colours its total by crit (green), Hope (orange) or Fear (purple). Renames /eph matchcrit to /eph duality.

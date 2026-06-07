@@ -12,6 +12,12 @@
 
 local _, Me = ...   -- ... is (addonName, addonTable); we want the shared table
 
+-- EditModeExpanded registers the "is typing..." bar as a native Edit Mode element
+-- so players can reposition it; the library persists the spot in our saved vars
+-- (Me.db.typingBarEditMode), per Edit Mode layout. Fetched silently so a missing
+-- library just disables repositioning rather than erroring.
+local EditModeExpanded = LibStub and LibStub:GetLibrary( "EditModeExpanded-1.0", true )
+
 -- Channels we consider "in-character chatter" worth announcing.
 local TRACKED_CHANNELS = {
 	SAY           = true,
@@ -27,6 +33,7 @@ Me.WhoIsTyping = {}     -- ordered list of names currently typing
 local typingFrame       -- the toast that shows "<Name> is typing..."
 local typingButton      -- the manual toggle button
 local selfTyping = false   -- our last-broadcast typing state
+local editModePreview = false  -- true while Edit Mode is open and we're holding a sample bar on screen
 
 -------------------------------------------------------------------------------
 -- Broadcast our typing state to the group.
@@ -39,6 +46,10 @@ end
 -- Show / refresh the toast based on who's typing, or fade it out when nobody is.
 --
 local function RefreshToast()
+	-- While the player is repositioning the bar in Edit Mode we hold a sample
+	-- toast on screen; don't let real typing traffic hide it or rewrite the text.
+	if editModePreview then return end
+
 	if #Me.WhoIsTyping > 0 then
 		local text = Me.WhoIsTyping[1]
 		local plural = " is"
@@ -199,24 +210,6 @@ local function AnchorButtonDefault()
 end
 
 -------------------------------------------------------------------------------
--- Apply the position saved in Me.db (relative to UIParent), or fall back to the
--- default anchor when the player has never dragged the button. We persist the
--- spot ourselves rather than via SetUserPlaced because WoW's auto-restore of
--- user-placed *addon* frames is unreliable -- it silently fails to re-apply the
--- saved position on some characters (Virtusia being the case that surfaced it).
---
-local function RestoreButtonPosition()
-	if not typingButton then return end
-	local pos = Me.db and Me.db.typingButtonPos
-	if pos then
-		typingButton:ClearAllPoints()
-		typingButton:SetPoint( pos.point or "TOP", UIParent, pos.relPoint or "CENTER", pos.x or 0, pos.y or 0 )
-	else
-		AnchorButtonDefault()
-	end
-end
-
--------------------------------------------------------------------------------
 -- Build the manual-toggle chat button.
 --
 local function CreateToggleButton()
@@ -261,21 +254,10 @@ local function CreateToggleButton()
 
 	b.manual = false
 
-	-- Draggable + remembered position. SetUserPlaced is unreliable for custom
-	-- addon frames, so we persist the dragged spot ourselves in Me.db and
-	-- reapply it on the next login (see RestoreButtonPosition).
-	b:SetClampedToScreen( true )
-	b:SetMovable( true )
+	-- Mouse is needed for the click-to-toggle and tooltip. Positioning is handled
+	-- by WoW's Edit Mode (registered in RegisterFramesWithEditMode) rather than a
+	-- custom drag, so there's no OnDragStart/Stop here any more.
 	b:EnableMouse( true )
-	b:RegisterForDrag( "LeftButton" )
-	b:SetScript( "OnDragStart", b.StartMoving )
-	b:SetScript( "OnDragStop", function( self )
-		self:StopMovingOrSizing()
-		if Me.db then
-			local point, _, relPoint, x, y = self:GetPoint()
-			Me.db.typingButtonPos = { point = point, relPoint = relPoint, x = x, y = y }
-		end
-	end )
 
 	b:SetScript( "OnClick", OnButtonClick )
 	b:SetScript( "OnEnter", function( self )
@@ -293,7 +275,53 @@ local function CreateToggleButton()
 	b:SetScript( "OnLeave", function() GameTooltip:Hide() end )
 
 	typingButton = b
-	RestoreButtonPosition()
+	AnchorButtonDefault()
+end
+
+-------------------------------------------------------------------------------
+-- Register the toast bar and the toggle button with WoW's Edit Mode (via
+-- EditModeExpanded) so both can be repositioned natively, with the spot saved in
+-- our saved vars (per Edit Mode layout). Each frame becomes a selectable Edit Mode
+-- element with the standard selection box, label and per-frame Reset button.
+--
+-- If the library is missing the frames simply stay at their default anchors.
+--
+local function RegisterFramesWithEditMode()
+	if not EditModeExpanded or not Me.db then return end
+
+	EditModeExpanded:RegisterFrame(
+		typingFrame,
+		"Emberhollow: \"is typing...\" bar",
+		Me.db.typingBarEditMode,
+		UIParent, "BOTTOMLEFT", true
+	)
+	EditModeExpanded:RegisterFrame(
+		typingButton,
+		"Emberhollow: typing button",
+		Me.db.typingButtonEditMode,
+		UIParent, "BOTTOMLEFT", true
+	)
+
+	-- The bar is invisible (alpha 0, no text) whenever nobody is typing, so while
+	-- Edit Mode is open we force a legible sample onto it; on close we hand control
+	-- back to the normal typing logic. RefreshToast is suppressed in between via the
+	-- editModePreview flag. (The library's own hooks show/place the frames; these
+	-- just make the otherwise-hidden bar visible enough to grab.) The toggle button
+	-- is always visible, so it needs no such help.
+	if EditModeManagerFrame then
+		hooksecurefunc( EditModeManagerFrame, "EnterEditMode", function()
+			editModePreview = true
+			typingFrame.Message:SetText( "|TInterface/GossipFrame/ChatBubbleGossipIcon:16|t Someone is typing..." )
+			typingFrame:SetAlpha( 1 )
+		end )
+		hooksecurefunc( EditModeManagerFrame, "ExitEditMode", function()
+			editModePreview = false
+			if #Me.WhoIsTyping == 0 then
+				typingFrame:SetAlpha( 0 )
+			end
+			RefreshToast()
+		end )
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -322,26 +350,10 @@ function Me.Typing_RefreshButton()
 end
 
 -------------------------------------------------------------------------------
--- Failsafe: snap the manual toggle button back to its default spot under the
--- chat tab, in case it got dragged somewhere it can't be found. Visibility
--- still follows the typing setting.
---
-function Me.Typing_ResetButton()
-	if not typingButton then return end
-	-- Forget any dragged position so it doesn't get reapplied on next login.
-	if Me.db then Me.db.typingButtonPos = nil end
-	AnchorButtonDefault()
-	-- Failsafe reveal: undo a stray drag *and* an accidental hide / zeroed alpha
-	-- (e.g. from fiddling in Edit Mode), regardless of the typing toggle.
-	typingButton:SetAlpha( 1 )
-	typingButton:Show()
-	Me.Print( "Typing button reset and revealed at its default spot under the chat tab." )
-end
-
--------------------------------------------------------------------------------
 function Me.Typing_Init()
 	CreateToastFrame()
 	CreateToggleButton()
+	RegisterFramesWithEditMode()
 
 	-- Hook every chat edit box so we notice typing in any chat window.
 	-- The handler is wrapped in pcall so that, no matter what, a bug in the

@@ -1,7 +1,8 @@
 # Emberhollow Pact Helper
 
-A small, self-contained World of Warcraft addon that provides two roleplay
-features extracted from [DiceMaster](../DiceMaster):
+A small, self-contained World of Warcraft addon with a handful of roleplay
+features. The dice rolling and "typing..." indicator were extracted from
+[DiceMaster](../DiceMaster); the rest are original to this addon.
 
 1. **Rich dice rolling** — turns the plain `Name rolls 14 (1-20)` system line into
    formatted results that understand chained dice and modifiers, with crit
@@ -12,9 +13,23 @@ features extracted from [DiceMaster](../DiceMaster):
    with `/eph duality`.
 2. **"Typing..." indicator** — shows your group a small toast while you compose
    an in-character message, plus a chat button to flag longer posts manually.
+   Both the toast bar and the button are repositioned through WoW's built-in
+   Edit Mode.
+3. **Marker naming** — give the eight raid target icons (Star … Skull) custom
+   roleplay names, e.g. Skull = "The Cursed Altar", edited in a resizable panel
+   (`/eph marker`). Names sync to your group over the addon channel. Editing is
+   gated behind **DM mode**: only a DM can change or clear the names; everyone
+   else sees them read-only and still receives the DM's updates.
+4. **Cheat sheet** — a movable, pageable reference window for the group's dice
+   rules (`/eph cheatsheet`).
+5. **Launcher button** — a minimap button (and a matching Blizzard
+   addon-compartment entry) that opens the addon's windows, plus an optional
+   button on the [Total RP 3](../totalRP3) toolbar when that addon is present.
 
-Unlike DiceMaster it ships with **no external libraries** — everything uses the
-stock WoW API.
+Dependencies are kept to a minimum and everything else uses the stock WoW API.
+Embedded libraries (under [`Libs/`](Libs)): LibStub; EditModeExpanded-1.0 (native
+Edit Mode integration for the typing UI); and LibDataBroker-1.1 + LibDBIcon-1.0
+(plus CallbackHandler-1.0) for the minimap button.
 
 ## Commands
 
@@ -26,9 +41,12 @@ stock WoW API.
 | `/eph` | Show help. |
 | `/eph options` | Open the options panel (also `config`, `opt`); also under Game Menu > Options > AddOns. |
 | `/eph typing [on\|off]` | Toggle the typing indicator (default on). |
-| `/eph resetbutton` | Failsafe: move the manual typing button back to its default spot under the chat tab and reveal it (also `resettyping`). |
 | `/eph grouprolls [on\|off]` | Also show plain-text rolls broadcast by the group (default off). |
 | `/eph duality [on\|off]` | Colour a single 2d12 total by Daggerheart Duality: crit (green), Hope (orange), Fear (purple). Default on; recolour the three from the options panel. |
+| `/eph marker` | Open the marker-names panel (also `mark`). As a DM you can also `/eph marker skull <name>` to set a name and `/eph marker list` to print them. |
+| `/eph dm [on\|off]` | Toggle **DM mode** — only a DM may edit/clear the marker names (default off). Also in the options panel. |
+| `/eph minimap [on\|off]` | Show or hide the minimap launcher button. |
+| `/eph cheatsheet` | Open the reference cheat sheet window (also `cheat`, `cs`). |
 
 The native `/roll` command is hooked too, so ordinary rolls get the same rich
 formatting and are shared with other addon users in your party/raid.
@@ -50,15 +68,64 @@ chained, multi-dice rolls with modifiers, the addon:
 Group members without the addon still see the raw rolls plus an optional
 `<Emberhollow>` summary, so nothing is lost on them.
 
+## Marker naming & DM mode
+
+Open the panel with `/eph marker`. It lists the eight raid target icons, each with
+an editable name; the window is movable and resizable, and remembers its size and
+position. Names sync to other addon users in your home party/raid over the `EPH1`
+prefix (last writer wins) and persist between sessions.
+
+Editing is reserved for a **DM**. Enable it with `/eph dm on` (or the checkbox in
+the options panel); it is **off by default**. As a DM the name boxes become
+editable and a **Clear All** button appears (with an "are you sure?" confirmation
+before it wipes every name for you and the group). Without DM mode the names are
+read-only — you can still see them and you keep receiving the DM's updates, but you
+can't change them.
+
+## Launcher button
+
+A button on the minimap (provided by LibDBIcon) opens the addon's windows; drag it
+around the ring to reposition it, and toggle it with `/eph minimap`. A matching
+entry is added to Blizzard's addon compartment. The clicks are:
+
+| Click | Opens |
+| --- | --- |
+| Left | Options |
+| Right | Marker names |
+| Shift + right | Cheat sheet |
+
+If [Total RP 3](../totalRP3) is installed, the same actions are also available from
+a button added to its toolbar.
+
+## Window styling
+
+The cheat sheet and marker windows share a Total RP-inspired look: a parchment
+texture under a soft dark overlay inside the ornate gold dialog border, with white
+text for contrast. All from stock WoW textures — no bundled art.
+
 ## File layout
 
 | File | Responsibility |
 | --- | --- |
-| `Core.lua` | Namespace, saved variables, addon-comm send/receive routing, shared helpers. |
+| `Core.lua` | Namespace, saved variables, addon-comm send/receive routing, shared helpers (incl. the shared window styling and launcher click handler). |
 | `Dice.lua` | Roll command, roll/result matching, chat filters, `RandomRoll` hook. |
-| `Typing.lua` | Typing detection, the toast frame and the manual toggle button. |
-| `Options.lua` | The Options > AddOns settings page: feature toggles and Duality colour pickers. |
+| `Typing.lua` | Typing detection, the toast frame and the manual toggle button, and their Edit Mode registration. |
+| `Marker.lua` | The marker-naming panel, DM-mode gating, the Clear All button, and the `M` sync message handler. |
+| `CheatSheet.lua` / `CheatSheet.xml` | The pageable reference window (behaviour / layout). |
+| `Minimap.lua` | The LibDBIcon minimap button and the addon-compartment entry. |
+| `TRP.lua` | Optional Total RP 3 toolbar button (does nothing if TRP isn't loaded). |
+| `Options.lua` | The Options > AddOns settings page: feature toggles, DM mode, and Duality colour pickers. |
 | `Console.lua` | Slash command registration. |
+| `Libs/` | Embedded libraries: LibStub, EditModeExpanded-1.0 (Edit Mode integration for the typing UI), and LibDataBroker-1.1 + LibDBIcon-1.0 + CallbackHandler-1.0 (minimap button). |
+
+## Moving the typing UI
+
+The "is typing..." bar and the manual toggle button are registered as native
+**Edit Mode** elements (via EditModeExpanded). Open Edit Mode (Game Menu > Edit
+Mode), where both appear as selectable, draggable frames — the bar shows a sample
+"Someone is typing..." so you can place it even when nobody is. Positions are saved
+per Edit Mode layout (account-wide for the default layout) and restored on login;
+each frame also gets a per-frame **Reset** button in Edit Mode.
 
 ## Note: running alongside DiceMaster
 

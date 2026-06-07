@@ -22,6 +22,9 @@ local _, Me = ...   -- ... is (addonName, addonTable); we want the shared table
 -- the page bodies readable. The theme: Hope is the system's "good" die
 -- (yellow/gold), Fear its "bad" die (purple); the rest are restrained accents.
 --
+-- These are bright accents that read on the dark, shadowed background (see
+-- Me.StyleParchmentFrame) together with the white body text.
+--
 local function colour( hex, s ) return "|cff" .. hex .. s .. "|r" end
 local function Hope( s ) return colour( "ffd100", s ) end   -- yellow / gold
 local function Fear( s ) return colour( "a335ee", s ) end   -- purple
@@ -196,6 +199,13 @@ function Me.CheatSheet_Init()
 	-- Where we stash the remembered position/size. Lazily created so we don't
 	-- have to touch Core's DB_DEFAULTS.
 	Me.db.cheatSheet = Me.db.cheatSheet or {}
+
+	-- Shadowed-parchment look; white text so it reads on the dark background.
+	Me.StyleParchmentFrame( frame )
+	local tc = Me.TEXT_COLOR
+	frame.TitleText:SetTextColor( tc.r, tc.g, tc.b )
+	frame.Body:SetTextColor( tc.r, tc.g, tc.b )
+	frame.PageNum:SetTextColor( tc.r, tc.g, tc.b )
 
 	-- Drag the window around by grabbing anywhere on it; save where it lands.
 	frame:SetClampedToScreen( true )

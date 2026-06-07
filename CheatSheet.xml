@@ -3,13 +3,14 @@
 	<!--
 		Cheat-sheet window layout.
 
-		A plain dialog: a bare Frame given the standard bordered, dark-backed look
-		via DialogBorderTemplate, with no portrait. Pure layout only. All behaviour
-		(paging, dragging, resizing, button clicks) is wired up in Lua
-		(CheatSheet.lua, Me.CheatSheet_Init) so this file stays a plain description
-		of the widgets.
+		A plain dialog given the addon's shared "parchment in a gold frame" look:
+		it inherits BackdropTemplate so Me.StyleParchmentFrame (Core.lua) can paint
+		a tileable parchment fill inside the ornate gold dialog border. Pure layout
+		only. All behaviour (paging, dragging, resizing, button clicks) and the
+		backdrop/text colours are wired up in Lua (CheatSheet.lua,
+		Me.CheatSheet_Init) so this file stays a plain description of the widgets.
 	-->
-	<Frame name="EmberhollowCheatSheetFrame" parent="UIParent" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" hidden="true">
+	<Frame name="EmberhollowCheatSheetFrame" inherits="BackdropTemplate" parent="UIParent" frameStrata="HIGH" toplevel="true" enableMouse="true" movable="true" hidden="true">
 		<Size x="380" y="320"/>
 		<Anchors>
 			<Anchor point="CENTER"/>
@@ -40,9 +41,6 @@
 		</Layers>
 
 		<Frames>
-			<!-- Standard bordered dialog frame (dark background + gold border). -->
-			<Frame parentKey="Border" inherits="DialogBorderTemplate"/>
-
 			<!-- Close (X) button, top-right. -->
 			<Button parentKey="CloseButton" inherits="UIPanelCloseButton">
 				<Anchors>
