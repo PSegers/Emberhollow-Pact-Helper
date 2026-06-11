@@ -48,6 +48,12 @@ local function MainCommand( msg )
 	elseif command == "marker" or command == "mark" then
 		if Me.Marker_Command then Me.Marker_Command( rawRest ) end
 
+	elseif command == "dicegames" or command == "games" then
+		if Me.DiceGames_Toggle then Me.DiceGames_Toggle() end
+
+	elseif command == "farkle" then
+		if Me.Farkle_Open then Me.Farkle_Open() end
+
 	elseif command == "dm" then
 		if rest == "on" or rest == "true" then
 			Me.db.dmEnabled = true
@@ -121,6 +127,7 @@ local function MainCommand( msg )
 		Me.PrintSystemMessage( "- /eph options  -- open the options panel (also: config, opt)" )
 		Me.PrintSystemMessage( "- /eph cs  -- open the reference cheat sheet window (also: cheat, cheatsheet)" )
 		Me.PrintSystemMessage( "- /eph marker  -- name the raid target icons (panel; syncs to your group). Also: /eph marker skull <name>, /eph marker list" )
+		Me.PrintSystemMessage( "- /eph dicegames  -- open the dice games menu (also: games). /eph farkle opens Farkle directly" )
 		Me.PrintSystemMessage( "- /eph dm (on || off)  -- DM mode: only a DM can edit/clear the marker names" )
 		Me.PrintSystemMessage( "- /eph minimap (on || off)  -- show/hide the minimap button (left: options, right: markers, shift-right: cheat sheet)" )
 		Me.PrintSystemMessage( "- /eph typing (on || off)  -- toggle the typing indicator" )

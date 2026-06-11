@@ -60,6 +60,18 @@ local DB_DEFAULTS = {
 	-- Minimap launcher button settings table owned by LibDBIcon-1.0 (it stores
 	-- hide + minimapPos here). See Minimap.lua.
 	minimap = { hide = false },
+
+	-- Remembered window positions for the Dice Games hub and the Farkle window
+	-- (see DiceGames.lua / Farkle.lua).
+	diceGamesHub = {},
+	farkleWindow = {},
+	farkleScoreWindow = {},
+
+	-- Dice ownership + the Farkle dice pool (see DiceGames.lua / DiceInventory.lua).
+	-- diceOwned maps a die id -> true; dicePool is the six die ids rolled with.
+	diceOwned = {},
+	dicePool  = { "regular", "regular", "regular", "regular", "regular", "regular" },
+	diceInventoryWindow = {},
 }
 
 -------------------------------------------------------------------------------
@@ -306,6 +318,9 @@ bootstrap:SetScript( "OnEvent", function( self, event, arg1 )
 		SafeInit( "CheatSheet", Me.CheatSheet_Init )
 		SafeInit( "Marker", Me.Marker_Init )
 		SafeInit( "Minimap", Me.Minimap_Init )
+		SafeInit( "DiceGames", Me.DiceGames_Init )
+		SafeInit( "DiceInventory", Me.DiceInventory_Init )
+		SafeInit( "Farkle", Me.Farkle_Init )
 		SafeInit( "Options", Me.Options_Init )
 			SafeInit( "Console", Me.Console_Init )
 

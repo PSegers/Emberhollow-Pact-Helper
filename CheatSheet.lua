@@ -231,11 +231,8 @@ function Me.CheatSheet_Init()
 		SavePlacement()
 	end )
 
-	-- Also capture placement whenever it closes (Escape or the X button).
+	-- Also capture placement whenever it closes (the X button).
 	frame:HookScript( "OnHide", SavePlacement )
-
-	-- Close with Escape, like most Blizzard panels.
-	tinsert( UISpecialFrames, "EmberhollowCheatSheetFrame" )
 
 	-- Page-turn arrows.
 	frame.PrevButton:SetScript( "OnClick", function()

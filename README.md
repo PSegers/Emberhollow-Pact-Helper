@@ -22,7 +22,12 @@ features. The dice rolling and "typing..." indicator were extracted from
    else sees them read-only and still receives the DM's updates.
 4. **Cheat sheet** — a movable, pageable reference window for the group's dice
    rules (`/eph cheatsheet`).
-5. **Launcher button** — a minimap button (and a matching Blizzard
+5. **Dice games** — a suite of dice games (`/eph dicegames`), starting with
+   **Farkle**: roll six dice, set aside the scorers, then push your luck or pass.
+   The games roll their own *weighted* dice (not WoW's `/roll`) from an editable
+   library, you stock a six-die pool in an inventory, and every roll/pass/bust is
+   announced as an `/emote` so a group can play along.
+6. **Launcher button** — a minimap button (and a matching Blizzard
    addon-compartment entry) that opens the addon's windows, plus an optional
    button on the [Total RP 3](../totalRP3) toolbar when that addon is present.
 
@@ -47,6 +52,8 @@ Edit Mode integration for the typing UI); and LibDataBroker-1.1 + LibDBIcon-1.0
 | `/eph dm [on\|off]` | Toggle **DM mode** — only a DM may edit/clear the marker names (default off). Also in the options panel. |
 | `/eph minimap [on\|off]` | Show or hide the minimap launcher button. |
 | `/eph cheatsheet` | Open the reference cheat sheet window (also `cheat`, `cs`). |
+| `/eph dicegames` | Open the dice games menu (also `games`). |
+| `/eph farkle` | Open Farkle directly. |
 
 The native `/roll` command is hooked too, so ordinary rolls get the same rich
 formatting and are shared with other addon users in your party/raid.
@@ -82,6 +89,29 @@ before it wipes every name for you and the group). Without DM mode the names are
 read-only — you can still see them and you keep receiving the DM's updates, but you
 can't change them.
 
+## Dice games
+
+Open the games menu with `/eph dicegames` (or `/eph games`). It's built as a hub
+so more games can be added over time; the first is **Farkle**.
+
+**Farkle** (`/eph farkle`) is a solo push-your-luck game with six dice. Roll, set
+aside any scoring dice, then either roll the rest for more or pass to bank the
+turn. Bust (a roll with no scoring dice) and you lose everything banked that turn;
+set all six aside and you get "hot dice" — roll all six again, the turn continuing.
+Scoring (also on the in-window **?** sheet): each 1 = 100, each 5 = 50, three of a
+kind = 100 × the face (three 1s = 1000), each extra die past the third doubles it,
+and straights score 500 (1-5), 750 (2-6) or 1500 (1-6). Every roll, pass and bust
+is posted as an `/emote`, so a group can follow along and keep their own scores.
+
+The games **don't** use WoW's `/roll` — they roll their own *weighted* dice, so a
+die can be loaded for or against any face. The catalogue lives in
+[`DiceData.lua`](DiceData.lua) as a plain, editable list (id, name, six face
+weights, description); rename dice, change the odds or add your own. In the
+**inventory** (the Farkle menu's *Inventory* button) you set how many of each die
+you own (0-6) and fill a six-die **pool** — duplicates allowed, up to as many as
+you own — which the next game rolls with. Hover any die, in the inventory or in
+the game, to see its per-face odds and flavour text.
+
 ## Launcher button
 
 A button on the minimap (provided by LibDBIcon) opens the addon's windows; drag it
@@ -112,6 +142,10 @@ text for contrast. All from stock WoW textures — no bundled art.
 | `Typing.lua` | Typing detection, the toast frame and the manual toggle button, and their Edit Mode registration. |
 | `Marker.lua` | The marker-naming panel, DM-mode gating, the Clear All button, and the `M` sync message handler. |
 | `CheatSheet.lua` / `CheatSheet.xml` | The pageable reference window (behaviour / layout). |
+| `DiceGames.lua` | Dice games hub: the game registry, custom weighted-dice RNG, ownership/pool helpers, the shared window builder and the die tooltip. |
+| `DiceData.lua` | The editable dice library (names, weights, descriptions) as a plain Lua table. |
+| `DiceInventory.lua` | The inventory window: owned counts (0-6) per die and the six-die Farkle pool. |
+| `Farkle.lua` | The Farkle game: rules, scoring, the play window and the scoring-sheet reference. |
 | `Minimap.lua` | The LibDBIcon minimap button and the addon-compartment entry. |
 | `TRP.lua` | Optional Total RP 3 toolbar button (does nothing if TRP isn't loaded). |
 | `Options.lua` | The Options > AddOns settings page: feature toggles, DM mode, and Duality colour pickers. |

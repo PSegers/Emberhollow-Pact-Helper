@@ -1,5 +1,15 @@
 Changelog
 
+1.2.0
+Dice Games: a new suite of dice games, opened with /eph dicegames (or /eph games). Built as a hub so more games can be added later.
+Farkle: the first game -- roll six dice, set aside the scorers, then push your luck or pass. Hot dice, busts and the full scoring table (singles, three-of-a-kind and up, straights) are all in. Each roll, pass and bust is announced as an /emote so a group can play along. Includes a "?" scoring-sheet reference window.
+Custom dice rolling: the games use their own weighted dice (not WoW's /roll), so dice can be loaded for/against any face.
+Dice library: an editable list of dice (names, weights, descriptions) in DiceData.lua -- rename or add your own.
+Dice inventory: set how many of each die you own (0-6) and build a six-die pool the Farkle game rolls with. Hover any die (in the inventory or in-game) to see its odds and flavour.
+
+1.1.1
+The Cheat sheet and Marker windows no longer close when you press Escape (use the X button to close them).
+
 1.1.0
 Marker Naming: give the 8 raid target icons (Star..Skull) custom RP names that sync to your group. Edit them in a panel (/eph marker) or from chat (/eph marker skull <name>, /eph marker list).
 Minimap launcher button: left-click opens Options, right-click opens Marker names, shift-right-click opens the Cheat sheet. Drag it around the ring; toggle with /eph minimap. Also adds a Blizzard addon-compartment entry.
