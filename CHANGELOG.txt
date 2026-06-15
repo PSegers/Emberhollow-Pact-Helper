@@ -1,5 +1,10 @@
 Changelog
 
+1.2.1
+Updated EditModeExpanded which includes some bug fixes.
+Updated Farkle dice to be more in line with WoW and Emberhollow lore.
+Farkle dice inventory now shows alphabetically.
+
 1.2.0
 Dice Games: a new suite of dice games, opened with /eph dicegames (or /eph games). Built as a hub so more games can be added later.
 Farkle: the first game -- roll six dice, set aside the scorers, then push your luck or pass. Hot dice, busts and the full scoring table (singles, three-of-a-kind and up, straights) are all in. Each roll, pass and bust is announced as an /emote so a group can play along. Includes a "?" scoring-sheet reference window.

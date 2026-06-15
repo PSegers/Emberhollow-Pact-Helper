@@ -24,12 +24,15 @@ local rows           -- one row per die in the catalogue
 local selectedSlot = 1
 
 -- Every die shown in the list: the always-available regular die first, then the
--- catalogue from DiceData.lua in order.
+-- rest of the catalogue (DiceData.lua) sorted alphabetically by name. Sorting a
+-- fresh copy keeps Me.DICE_LIBRARY's own order untouched for everything else.
 local function AllDice()
-	local list = { Me.REGULAR_DIE }
+	local list = {}
 	for _, d in ipairs( Me.DICE_LIBRARY or {} ) do
 		list[#list + 1] = d
 	end
+	table.sort( list, function( a, b ) return a.name < b.name end )
+	table.insert( list, 1, Me.REGULAR_DIE )   -- the unlimited regular die always heads the list
 	return list
 end
 

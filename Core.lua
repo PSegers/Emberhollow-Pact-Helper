@@ -325,5 +325,16 @@ bootstrap:SetScript( "OnEvent", function( self, event, arg1 )
 			SafeInit( "Console", Me.Console_Init )
 
 		Me.Print( "v" .. Me.version .. " loaded. Type |cffffd100/eph|r for help, |cffffd100/dice|r to roll." )
+
+		-- Log which EditModeExpanded-1.0 actually won the LibStub version race.
+		-- LibStub keeps only the highest MINOR loaded across every addon, so the
+		-- copy in use can differ per player depending on what else they run -- the
+		-- first thing to check when Edit Mode misbehaves for some users but not all.
+		-- (Read .minors directly: "LibStub and LibStub:GetLibrary(...)" would drop
+		-- the second return value, since "and" truncates to a single value.)
+		Me.emeVersion = LibStub and LibStub.minors and LibStub.minors["EditModeExpanded-1.0"]
+		if Me.emeVersion then
+			Me.Print( "EditModeExpanded-1.0 r" .. Me.emeVersion .. " in use." )
+		end
 	end
 end )

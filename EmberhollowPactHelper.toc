@@ -2,7 +2,7 @@
 ## Title: Emberhollow Pact Helper
 ## Notes: Roleplay dice rolling and a "typing..." indicator.
 ## Author: Emberhollow Pact
-## Version: 1.2.0
+## Version: 1.2.1
 ## SavedVariables: EmberhollowPactHelperDB
 ## Category-enUS: Roleplay
 ## IconTexture: Interface/AddOns/EmberhollowPactHelper/EPHLogo.tga
